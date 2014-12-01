@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical">
+    <EditText
+        android:id="@+id/jumbled_word_edit_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:imeOptions="actionNext"
+        android:privateImeOptions="nm"
+        android:hint="@string/type_jumbled_word_here"
+        android:inputType="textNoSuggestions"
+        android:digits="qwertzuiopasdfghjklyxcvbnm"
+        android:singleLine="true"
+        android:padding="4dp"/>
+    <LinearLayout
+        android:id="@+id/word_drawing_holder"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    </LinearLayout>
+</LinearLayout>

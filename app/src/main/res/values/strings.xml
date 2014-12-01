@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">un-Jumble</string>
+    <string name="action_settings">Settings</string>
+    <string name="numberOfWords">Number of words in Answer (1–4):</string>
+    <string name="calculateAnswer">Calculate answer</string>
+    <string name="lengthOfFirstWord">Length of first word:</string>
+    <string name="title_activity_result">Your answers!</string>
+    <string name="please_enter_value">Please enter a value for the number of words in the answer</string>
+    <string name="dialog_word_length_title">Pick the answer word lengths</string>
+    <string name="numberOfLettersInFirstWord">The number of letters in the first word?</string>
+    <string name="numberOfLettersInFourthWord">The number of letters in the fourth word?</string>
+    <string name="numberOfLettersInThirdtWord">The number of letters in the third word?</string>
+    <string name="numberOfLettersInSecondWord">The number of letters in the second word?</string>
+    <string name="resource_one">1</string>
+    <string name="totalNumberOfLetters">The total number of letters:</string>
+    <string name="are_letters_selected">It doesn\'t appear as though any letters have been selected?</string>
+    <string name="correct_the_totals">The entered wordlengths don\'t match the total number of characters selected?</string>
+    <string name="One">1</string>
+    <string name="no_results_found">No results have been found :(</string>
+    <string name="type_jumbled_word_here">Type the jumbled word here…</string>
+
+</resources>

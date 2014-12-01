@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="bottom"
+    android:orientation="vertical">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/numberOfWords" />
+
+        <EditText
+            android:id="@+id/number_of_words_in_answer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:digits="1234"
+            android:inputType="number"
+            android:maxLength="1"
+            android:selectAllOnFocus="true"
+            android:singleLine="true"
+            android:text="@string/One" />
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/answer_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/calculateAnswer" />
+</LinearLayout>
+
