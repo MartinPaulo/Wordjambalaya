@@ -20,5 +20,6 @@
     <string name="One">1</string>
     <string name="no_results_found">No results have been found :(</string>
     <string name="type_jumbled_word_here">Type the jumbled word here…</string>
+    <string name="numberOfLettersInWord">Number of letters in %s word?</string>
 
 </resources>

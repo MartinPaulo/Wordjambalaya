@@ -6,6 +6,7 @@ import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,27 +16,22 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import android.support.annotation.NonNull;
-
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * A dialog that asks the user to enter the lengths of each of the answer words, if more than one.
  * Created by martin paulo on 1/08/2014.
  */
 public class WordLengthPicker extends DialogFragment {
 
     public static final String EXTRA_WORD_SIZES = "WORD_SIZES";
-    private static final String CLAUSES[] = {"st", "nd", "rd", "th" };
+    private static final String SUFFIXES[] = {"th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th"};
 
-    private List<Integer> wordLengths;
     private int letterCount;
     private int wordCount;
-    private final TextView[] inputFields = new TextView[4];
-
-    public WordLengthPicker() {
-        wordLengths = new ArrayList<Integer>();
-    }
+    private final List<TextView> inputFields = new ArrayList<TextView>();
 
     public static WordLengthPicker newInstance(int wordCount, int letterCount) {
         WordLengthPicker result = new WordLengthPicker();
@@ -44,39 +40,18 @@ public class WordLengthPicker extends DialogFragment {
         return result;
     }
 
-    /**
-     * TODO: Make the input panels expand dynamically to match the number of words, rather than
-     * this static collection.
-     *
-     * @param savedInstanceState
-     * @return
-     */
     @Override
     @NonNull
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         View view = getActivity().getLayoutInflater().inflate(R.layout.word_length_picker, null);
+        for (int i = 0; i < wordCount; i++) {
+            ((LinearLayout) view).addView(getEditBox(i), i);
+        }
         TextView total = (TextView) view.findViewById(R.id.total_number_of_letters);
         total.setText(String.valueOf(letterCount));
-
-        LinearLayout[] inputPanels = new LinearLayout[4];
-        inputPanels[0] = (LinearLayout) view.findViewById(R.id.number_of_letters_1st_word_wrapper);
-        inputPanels[1] = (LinearLayout) view.findViewById(R.id.number_of_letters_2nd_word_wrapper);
-        inputPanels[2] = (LinearLayout) view.findViewById(R.id.number_of_letters_3rd_word_wrapper);
-        inputPanels[3] = (LinearLayout) view.findViewById(R.id.number_of_letters_4th_word_wrapper);
-        //inputPanels[4] = new LinearLayout(self);
-        for (int i = 0; i < inputPanels.length; i++) {
-            inputPanels[i].setVisibility(i < wordCount ? View.VISIBLE : View.INVISIBLE);
-        }
-        inputFields[0] = (TextView) view.findViewById(R.id.number_of_letters_1st_word);
-        inputFields[1] = (TextView) view.findViewById(R.id.number_of_letters_2nd_word);
-        inputFields[2] = (TextView) view.findViewById(R.id.number_of_letters_3rd_word);
-        inputFields[3] = (TextView) view.findViewById(R.id.number_of_letters_4th_word);
         for (int i = 0; i < wordCount; i++) {
-            if (i == wordCount - 1) {
-                inputFields[i].setText(String.valueOf(letterCount));
-            } else {
-                inputFields[i].setText("0");
-                inputFields[i].addTextChangedListener(getCountUpdater(inputFields[wordCount - 1]));
+            if (i < wordCount - 1) {
+                inputFields.get(i).addTextChangedListener(getCountUpdater(inputFields.get(wordCount - 1)));
             }
         }
 
@@ -90,6 +65,27 @@ public class WordLengthPicker extends DialogFragment {
         // request that the keyboard be shown when dialog is shown.
         alertDialog.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_VISIBLE);
         return alertDialog;
+    }
+
+    private View getEditBox(int position) {
+        View view = getActivity().getLayoutInflater().inflate(R.layout.word_length_edit_text, null);
+        TextView text = (TextView) view.findViewById(R.id.number_of_letters_word_text);
+        text.setText(String.format(text.getText().toString(), ordinal(position + 1)));
+        TextView e = (TextView) view.findViewById(R.id.number_of_letters_word_view);
+        e.setText(position == wordCount - 1 ? String.valueOf(letterCount) : "0");
+        inputFields.add(e);
+        return view;
+    }
+
+    private String ordinal(int i) {
+        switch (i % 100) {
+            case 11:
+            case 12:
+            case 13:
+                return i + "th";
+            default:
+                return i + SUFFIXES[i % 10];
+        }
     }
 
     private DialogInterface.OnShowListener getOnShowListener(final AlertDialog alertDialog) {
@@ -106,24 +102,24 @@ public class WordLengthPicker extends DialogFragment {
 
             @Override
             public void onClick(View view) {
-                int total = 0;
-                for (int i = 0; i < wordCount; i++) {
-                    int value = Integer.parseInt(inputFields[i].getText().toString());
-                    total = total + value;
-                }
-                // don't dismiss the dialog if the totals add up...
-                if (total != letterCount) {
+                if (wordLengthTotalEntered() != letterCount) {
+                    // don't dismiss the dialog if the totals don't add up...
                     Toast.makeText(WordLengthPicker.this.getActivity(), R.string.correct_the_totals, Toast.LENGTH_LONG).show();
                 } else {
-                    wordLengths.clear();
-                    for (int i = 0; i < wordCount; i++) {
-                        wordLengths.add(Integer.parseInt(inputFields[i].getText().toString()));
-                    }
                     sendResults(Activity.RESULT_OK);
                     alertDialog.dismiss();
                 }
             }
         };
+    }
+
+    private int wordLengthTotalEntered() {
+        int total = 0;
+        for (TextView field : inputFields) {
+            int value = Integer.parseInt(field.getText().toString());
+            total = total + value;
+        }
+        return total;
     }
 
     private TextWatcher getCountUpdater(final TextView lastInputField) {
@@ -140,12 +136,25 @@ public class WordLengthPicker extends DialogFragment {
 
             @Override
             public void afterTextChanged(Editable editable) {
-                int lastValue = Integer.parseInt(lastInputField.getText().toString());
-                int totalEntered = Integer.parseInt(editable.toString());
+                int lastValue = getIntegerValue(lastInputField.getText().toString());
+                int totalEntered = getIntegerValue(editable.toString());
                 lastInputField.setText(String.valueOf(lastValue - totalEntered));
             }
 
         };
+    }
+
+    private int getIntegerValue(String value) {
+        return value.length() > 0 ? Integer.parseInt(value) : 0;
+    }
+
+
+    private Serializable getWordLengthsEntered() {
+        ArrayList<Integer> wordLengths = new ArrayList<Integer>();
+        for (TextView field : inputFields) {
+            wordLengths.add(getIntegerValue(field.getText().toString()));
+        }
+        return wordLengths;
     }
 
     private void sendResults(int result) {
@@ -153,7 +162,7 @@ public class WordLengthPicker extends DialogFragment {
             return;
         }
         Intent i = new Intent();
-        i.putExtra(EXTRA_WORD_SIZES, new ArrayList<Integer>(wordLengths));
+        i.putExtra(EXTRA_WORD_SIZES, getWordLengthsEntered());
         getTargetFragment().onActivityResult(getTargetRequestCode(), result, i);
     }
 }
