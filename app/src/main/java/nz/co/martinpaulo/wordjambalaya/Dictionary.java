@@ -61,7 +61,12 @@ public final class Dictionary {
         return answer;
     }
 
-    private List<String> getColumn(int length, final String muddledWordsWithOrderedCharacters) {
+    /**
+     * @param length the length of the words that we are looking for
+     * @param muddledWordsWithOrderedCharacters the set of muddled words, with characters ordered.
+     * @return the list of words of the given length that are a subset of the ordered characters
+     */
+    private List<String> getCandidateWords(int length, final String muddledWordsWithOrderedCharacters) {
         List<String> result = new ArrayList<String>();
         nextWord:
         for (String key : sortedWords.keySet()) {
@@ -77,38 +82,29 @@ public final class Dictionary {
         return result;
     }
 
-    private void filterOutWords(List<List<String>> result, List<List<String>> wordLists, List<Integer> currentRow, String muddledWordsWithOrderedCharacters) {
-        if (currentRow.size() == wordLists.size()) {
-            String orderedWords = "";
-            List<String> line = new ArrayList();
-            for (int x = 0; x < wordLists.size(); x++) {
-                for (int y : currentRow) {
-                    final String candidate = wordLists.get(x).get(y);
-                    line.add(candidate);
-                    orderedWords = orderedWords + candidate;
-                }
-            }
-            String orderedWord = orderCharacters(orderedWords);
-            if (orderedWord.equals(muddledWordsWithOrderedCharacters)) {
-                result.add(line);
-            }
+    private List<List<String>> getPossibleAnswers(final List<Integer> wordLengths,
+                                                  final String muddledWordsWithOrderedCharacters) {
+        List<List<String>> columns = new ArrayList<List<String>>();
+        for (int wordLength : wordLengths) {
+            columns.add(getCandidateWords(wordLength, muddledWordsWithOrderedCharacters));
         }
-
+        return getCandidateWordSets(muddledWordsWithOrderedCharacters, columns);
     }
 
-    private List<List<String>> getPossibleWords(final List<Integer> wordLengths,
-                                                final String muddledWordsWithOrderedCharacters) {
-        List<List<String>> result = new ArrayList();
-        List<List<String>> columns = new ArrayList();
-        for (int wordLength : wordLengths) {
-            columns.add(getColumn(wordLength, muddledWordsWithOrderedCharacters));
-        }
+    /**
+     * Todo: recursion would handle more than three words...
+     * @param muddledWordsWithOrderedCharacters
+     * @param columns
+     * @return
+     */
+    protected List<List<String>> getCandidateWordSets(String muddledWordsWithOrderedCharacters, List<List<String>> columns) {
+        List<List<String>> result = new ArrayList<List<String>>();
         if (columns.size() == 1) {
             List<String> firstColumn = columns.get(0);
             for (String firstWord : firstColumn) {
                 String orderedWord = orderCharacters(firstWord);
                 if (orderedWord.equals(muddledWordsWithOrderedCharacters)) {
-                    List<String> line = new ArrayList();
+                    List<String> line = new ArrayList<String>();
                     line.add(firstWord);
                     result.add(line);
                 }
@@ -121,7 +117,7 @@ public final class Dictionary {
                     String testWord = firstWord + secondWord;
                     String orderedWord = orderCharacters(testWord);
                     if (orderedWord.equals(muddledWordsWithOrderedCharacters)) {
-                        List<String> line = new ArrayList();
+                        List<String> line = new ArrayList<String>();
                         line.add(firstWord);
                         line.add(secondWord);
                         result.add(line);
@@ -138,7 +134,7 @@ public final class Dictionary {
                         String testWord = firstWord + secondWord + thirdWord;
                         String orderedWord = orderCharacters(testWord);
                         if (orderedWord.equals(muddledWordsWithOrderedCharacters)) {
-                            List<String> line = new ArrayList();
+                            List<String> line = new ArrayList<String>();
                             line.add(firstWord);
                             line.add(secondWord);
                             line.add(thirdWord);
@@ -154,7 +150,7 @@ public final class Dictionary {
     public List<List<String>> findPossibleAnswers(final List<Integer> wordLengths) {
         Log.i(TAG, "Looking for " + wordLengths.size() + " words formed from " + selectChars);
         final String orderedCharactersOfMuddledWords = orderCharacters(selectChars);
-        return getPossibleWords(wordLengths, orderedCharactersOfMuddledWords);
+        return getPossibleAnswers(wordLengths, orderedCharactersOfMuddledWords);
     }
 
     /**
