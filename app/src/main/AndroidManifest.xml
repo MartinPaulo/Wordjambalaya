@@ -7,12 +7,14 @@
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:theme="@style/AppTheme" >
+        <!-- Stay in portrait mode until I can get the time to examine rotation. -->
+        <!-- Also need to make sure I handle async task correctly on rotation. -->
         <activity
             android:name=".ActivityJambalaya"
+            android:screenOrientation="portrait"
             android:label="@string/app_name" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
