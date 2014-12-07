@@ -8,7 +8,7 @@
     <string name="lengthOfFirstWord">Length of first word:</string>
     <string name="title_activity_result">Your answers!</string>
     <string name="please_enter_value">Please enter a value for the number of words in the answer</string>
-    <string name="dialog_word_length_title">Pick the answer word lengths</string>
+    <string name="dialog_word_length_title">Pick the answers word lengths</string>
     <string name="numberOfLettersInFirstWord">The number of letters in the first word?</string>
     <string name="numberOfLettersInFourthWord">The number of letters in the fourth word?</string>
     <string name="numberOfLettersInThirdtWord">The number of letters in the third word?</string>
