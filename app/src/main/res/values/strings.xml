@@ -3,7 +3,7 @@
 
     <string name="app_name">un-Jumble</string>
     <string name="action_settings">Settings</string>
-    <string name="numberOfWords">Number of words in Answer (1–4):</string>
+    <string name="numberOfWords">Number of words in Answer (1–9):</string>
     <string name="calculateAnswer">Calculate answer</string>
     <string name="lengthOfFirstWord">Length of first word:</string>
     <string name="title_activity_result">Your answers!</string>
