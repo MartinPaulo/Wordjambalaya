@@ -42,7 +42,7 @@ public final class Dictionary {
         words.add(word);
     }
 
-    private String orderCharacters(final String word) {
+    protected String orderCharacters(final String word) {
         char[] content = word.toCharArray();
         java.util.Arrays.sort(content);
         return new String(content);
@@ -62,7 +62,7 @@ public final class Dictionary {
     }
 
     /**
-     * @param length the length of the words that we are looking for
+     * @param length                            the length of the words that we are looking for
      * @param muddledWordsWithOrderedCharacters the set of muddled words, with characters ordered.
      * @return the list of words of the given length that are a subset of the ordered characters
      */
@@ -88,64 +88,47 @@ public final class Dictionary {
         for (int wordLength : wordLengths) {
             columns.add(getCandidateWords(wordLength, muddledWordsWithOrderedCharacters));
         }
+
         return getCandidateWordSets(muddledWordsWithOrderedCharacters, columns);
     }
 
-    /**
-     * Todo: recursion would handle more than three words...
-     * @param muddledWordsWithOrderedCharacters
-     * @param columns
-     * @return
-     */
-    protected List<List<String>> getCandidateWordSets(String muddledWordsWithOrderedCharacters, List<List<String>> columns) {
-        List<List<String>> result = new ArrayList<List<String>>();
-        if (columns.size() == 1) {
-            List<String> firstColumn = columns.get(0);
-            for (String firstWord : firstColumn) {
-                String orderedWord = orderCharacters(firstWord);
-                if (orderedWord.equals(muddledWordsWithOrderedCharacters)) {
-                    List<String> line = new ArrayList<String>();
-                    line.add(firstWord);
-                    result.add(line);
-                }
-            }
-        } else if (columns.size() == 2) {
-            List<String> firstColumn = columns.get(0);
-            List<String> secondColumn = columns.get(1);
-            for (String firstWord : firstColumn) {
-                for (String secondWord : secondColumn) {
-                    String testWord = firstWord + secondWord;
-                    String orderedWord = orderCharacters(testWord);
-                    if (orderedWord.equals(muddledWordsWithOrderedCharacters)) {
-                        List<String> line = new ArrayList<String>();
-                        line.add(firstWord);
-                        line.add(secondWord);
-                        result.add(line);
-                    }
-                }
-            }
-        } else if (columns.size() == 3) {
-            List<String> firstColumn = columns.get(0);
-            List<String> secondColumn = columns.get(1);
-            List<String> thirdColumn = columns.get(2);
-            for (String firstWord : firstColumn) {
-                for (String secondWord : secondColumn) {
-                    for (String thirdWord : thirdColumn) {
-                        String testWord = firstWord + secondWord + thirdWord;
-                        String orderedWord = orderCharacters(testWord);
-                        if (orderedWord.equals(muddledWordsWithOrderedCharacters)) {
-                            List<String> line = new ArrayList<String>();
-                            line.add(firstWord);
-                            line.add(secondWord);
-                            line.add(thirdWord);
-                            result.add(line);
-                        }
-                    }
-                }
-            }
+    protected String orderCharactersOf(final List<String> words) {
+        String result = "";
+        for (String word : words) {
+            result = result + word;
         }
+        return orderCharacters(result);
+    }
+
+    protected List<List<String>> getCandidateWordSets(String muddledWordsWithOrderedCharacters, List<List<String>> columns) {
+        final ArrayList<List<String>> result = new ArrayList<List<String>>();
+        recursivelyFindCandidateWordSets(muddledWordsWithOrderedCharacters, columns, result, 0, new ArrayList<String>());
         return result;
     }
+
+    protected void recursivelyFindCandidateWordSets(String muddledWordsWithOrderedCharacters,
+                                                    List<List<String>> columns,
+                                                    List<List<String>> result,
+                                                    final int currentColumn,
+                                                    List<String> candidateWordSet) {
+        for (String word : columns.get(currentColumn)) {
+            List<String> newCandidateWordSet = new ArrayList<String>(candidateWordSet);
+            newCandidateWordSet.add(word);
+            if (currentColumn >= columns.size() - 1) {
+                testAndAddToResultIfMatch(result, muddledWordsWithOrderedCharacters, newCandidateWordSet);
+            } else {
+                recursivelyFindCandidateWordSets(muddledWordsWithOrderedCharacters, columns, result, currentColumn + 1, newCandidateWordSet);
+            }
+        }
+    }
+
+    private void testAndAddToResultIfMatch(List<List<String>> result, String muddledWordsWithOrderedCharacters, List<String> candidateWords) {
+        String orderedWord = orderCharactersOf(candidateWords);
+        if (orderedWord.equals(muddledWordsWithOrderedCharacters)) {
+            result.add(candidateWords);
+        }
+    }
+
 
     public List<List<String>> findPossibleAnswers(final List<Integer> wordLengths) {
         Log.i(TAG, "Looking for " + wordLengths.size() + " words formed from " + selectChars);
@@ -155,8 +138,6 @@ public final class Dictionary {
 
     /**
      * Need to make sure that this not reloaded if the configuration changes...
-     * @param ctx
-     * @return
      */
     static Dictionary buildDictionary(Context ctx) {
         Class raw = R.raw.class;
