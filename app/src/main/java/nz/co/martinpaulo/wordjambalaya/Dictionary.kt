@@ -22,8 +22,8 @@ class Dictionary private constructor() {
     private var sortedWords: HashMap<String, MutableSet<String>> = HashMap()
 
     private var isInitialized = false // has the dictionary been loaded?
-    /** the list of characters selected to make up the answer */
-    private var answerCharacters = ""
+    /** the list of characters selected to make up the riddle answer */
+    private var riddleAnswerChars = ""
 
     private fun addWord(word: String) {
         val key = orderCharacters(word)
@@ -62,7 +62,7 @@ class Dictionary private constructor() {
 
     /**
      * @param length                            the length of the words that we are looking for
-     * @param muddledWordsWithOrderedCharacters the set of muddled words, with characters ordered.
+     * @param muddledWordsWithOrderedCharacters the set of muddled words, with the characters ordered.
      * @return the list of words of the given length that are a subset of the ordered characters
      */
     private fun getCandidateWords(
@@ -106,15 +106,11 @@ class Dictionary private constructor() {
 
     /**
      *
-     * @param words
-     * @return
+     * @param words a list of words
+     * @return the list of input words concatenated and then with their characters sorted
      */
     fun orderCharactersOf(words: List<String>): String {
-        val result = StringBuilder()
-        for (word in words) {
-            result.append(word)
-        }
-        return orderCharacters(result.toString())
+        return orderCharacters(words.joinToString("") { it }.takeWhile { it.isLetter() })
     }
 
     /**
@@ -167,6 +163,7 @@ class Dictionary private constructor() {
     }
 
     /**
+     *
      * @param result
      * @param muddledWordsWithOrderedCharacters
      * @param candidateWords
@@ -183,13 +180,13 @@ class Dictionary private constructor() {
     }
 
 
-    fun findPossibleAnswers(wordLengths: List<Int?>?): List<List<String>> {
-        Log.i(TAG, "Looking for " + (wordLengths?.size ?: 1) + " words formed from " + answerCharacters)
-        val orderedCharactersOfMuddledWords = orderCharacters(answerCharacters)
+    fun findPossibleRiddleAnswers(wordLengths: List<Int?>?): List<List<String>> {
+        Log.i(TAG, "Looking for " + (wordLengths?.size ?: 1) + " words formed from " + riddleAnswerChars)
+        val orderedCharactersOfMuddledWords = orderCharacters(riddleAnswerChars)
         return getPossibleAnswers(wordLengths, orderedCharactersOfMuddledWords)
     }
 
-    private fun readRawTextFile(ctx: Context, resId: Int) {
+    private fun readWordFile(ctx: Context, resId: Int) {
         val inputStream = ctx.resources.openRawResource(resId)
         val inputReader = InputStreamReader(inputStream)
         val bufferReader = BufferedReader(inputReader, 8192)
@@ -204,29 +201,28 @@ class Dictionary private constructor() {
     }
 
     /**
-     * Add a character to the list of characters to be used to make the answer.
+     * Add a character to the list of characters to be used to make the riddle answer.
      */
-    fun addAnswerChar(character: Char) {
-        answerCharacters += character
+    fun addCharToRiddleAnswer(character: Char) {
+        riddleAnswerChars += character
     }
 
     /**
      * Remove the first instance of the character from the list of characters to be used to make the
-     * answer.
+     * riddle  answer.
      */
-    fun removeAnswerChar(character: Char) {
-        answerCharacters = answerCharacters.replaceFirst(character.toString().toRegex(), "")
+    fun removeCharFromRiddleAnswer(character: Char) {
+        riddleAnswerChars = riddleAnswerChars.replaceFirst(character.toString(), "")
     }
 
     /**
      * The length of the answer string so far
      */
-    val answerLength: Int
-        get() = answerCharacters.length
+    val riddleAnswerLength: Int
+        get() = riddleAnswerChars.length
 
     companion object {
         private const val TAG = "Dictionary"
-
         private val instance = Dictionary()
 
         /**
@@ -235,10 +231,10 @@ class Dictionary private constructor() {
         @JvmStatic
         fun buildDictionary(ctx: Context): Dictionary {
             val raw = raw::class.java   // represents the raw folder
-            var exceptionThrown = false
-            for (file in raw.fields) { // the files in the raw folder
+            var exceptionThrown = false // record if there were any errors reading the files
+            for (file in raw.fields) {  // for each of the files in the raw folder...
                 try {
-                    instance.readRawTextFile(ctx, file.getInt(null))
+                    instance.readWordFile(ctx, file.getInt(null))
                 } catch (e: IllegalAccessException) {
                     exceptionThrown = true
                     Log.e(TAG, String.format("%s threw IllegalAccessException.", file.name)

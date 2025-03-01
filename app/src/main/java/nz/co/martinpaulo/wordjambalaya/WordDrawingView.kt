@@ -87,9 +87,9 @@ class WordDrawingView(context: Context?, attributeSet: AttributeSet?) :
         super.performClick()
         isActive = !isActive
         if (isActive) {
-            Dictionary.getInstance().addAnswerChar(character)
+            Dictionary.getInstance().addCharToRiddleAnswer(character)
         } else {
-            Dictionary.getInstance().removeAnswerChar(character)
+            Dictionary.getInstance().removeCharFromRiddleAnswer(character)
         }
         invalidate()
         return true
@@ -97,17 +97,17 @@ class WordDrawingView(context: Context?, attributeSet: AttributeSet?) :
 
     fun setCharacter(character: Char) {
         if (this.character.code > 0 && isActive) {
-            Dictionary.getInstance().removeAnswerChar(this.character)
+            Dictionary.getInstance().removeCharFromRiddleAnswer(this.character)
         }
         this.character = character
         if (this.character.code > 0 && isActive) {
-            Dictionary.getInstance().addAnswerChar(this.character)
+            Dictionary.getInstance().addCharToRiddleAnswer(this.character)
         }
     }
 
     fun cleanUp() {
         if (isActive) {
-            Dictionary.getInstance().removeAnswerChar(character)
+            Dictionary.getInstance().removeCharFromRiddleAnswer(character)
             isActive = false
         }
     }

@@ -41,7 +41,7 @@ class FragmentAnswer : Fragment() {
         @Deprecated("Deprecated in Java")
         override fun doInBackground(vararg lists: List<Int?>?): List<List<String>> {
             activity
-            return getInstance().findPossibleAnswers(lists[0])
+            return getInstance().findPossibleRiddleAnswers(lists[0])
         }
     }
 
@@ -64,7 +64,7 @@ class FragmentAnswer : Fragment() {
                 return@setOnClickListener
             }
             val letterCount =
-                getInstance().answerLength
+                getInstance().riddleAnswerLength
             if (letterCount <= 0) {
                 Toast.makeText(
                     this@FragmentAnswer.activity,
